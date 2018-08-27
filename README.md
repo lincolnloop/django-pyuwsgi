@@ -29,7 +29,7 @@ Run uWSGI as a Python module.
 
 For convenience, a Django management command wrapper is included. Simply add `uwsgi_pylib` to your `INSTALLED_APPS` and run:
 
-```python
+```
 manage.py uwsgi --socket=:8000 ...
 ```
 
