@@ -9,7 +9,6 @@ def run(*uwsgi_args):
     # load the uwsgi library in the global namespace
     uwsgi = ctypes.CDLL(UWSGI_LIB, mode=ctypes.RTLD_GLOBAL)
     uwsgi_binary = sys.argv[0]
-
     args = [uwsgi_binary, "--binary-path", uwsgi_binary] + list(uwsgi_args)
 
     # build command line args

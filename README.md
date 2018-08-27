@@ -54,3 +54,7 @@ By setting the environment variable `UWSGI_AS_LIB`, we can force `pip install uw
 ### Running the Shared Library as a Python Module
 
 The shared library is loaded via the `ctypes` library and executed using an exported function `uwsgi_init`.
+
+## Known Issues
+
+* Randomly crashes on MacOS. See [unbit/uwsgi#1796](https://github.com/unbit/uwsgi/issues/1796)

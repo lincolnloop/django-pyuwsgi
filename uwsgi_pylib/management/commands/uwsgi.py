@@ -24,4 +24,5 @@ class Command(BaseCommand):
                     ),
                 ]
             )
-        runner.run(default_args + argv[2:])
+        args = default_args + argv[2:]
+        runner.run(*args)
