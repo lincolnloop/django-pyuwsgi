@@ -14,7 +14,11 @@ def run(*uwsgi_args):
     # build command line args
     argv = (ctypes.c_char_p * (len(args) + 1))()
     for pos, arg in enumerate(args):
-        argv[pos] = bytes(arg, "utf-8")
+        try:
+            argv[pos] = bytes(arg, "utf8")
+        except TypeError:
+            # Python 2
+            argv[pos] = arg.encode("utf8")
     # inform the uwsgi engine, the passed environ is not safe to overwrite
     envs = (ctypes.c_char_p * 1)()
     # enter into uWSGI !!!

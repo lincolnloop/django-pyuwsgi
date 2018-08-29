@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import time
 
 import pytest
 
@@ -23,19 +24,24 @@ def run(*args):
     )
 
 
-def run_django(*args, **subprocess_kwargs):
+def run_django(*args):
+    # timeout isn't supported in Python 2.7, do it the hard way...
     pytest.importorskip("django")
-    return subprocess.check_output(
+    proc = subprocess.Popen(
         [
             sys.executable,
             "-c",
             "from uwsgi_pylib.management.commands.uwsgi import Command; "
             "Command().execute({})".format(_args_to_str(args)),
         ],
+        stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         env={"DJANGO_SETTINGS_MODULE": "uwsgi_pylib.tests.django_settings"},
-        **subprocess_kwargs
     )
+    time.sleep(1)
+    proc.kill()
+    return proc
+
 
 
 def test_help():
@@ -52,8 +58,5 @@ def test_need_app():
 
 def test_django():
     """Start a Django HTTP server and then kill it"""
-    try:
-        run_django("--http-socket=127.0.0.1:0", timeout=1)
-        assert False
-    except subprocess.TimeoutExpired as e:
-        assert "WSGI app 0 (mountpoint='') ready in" in e.output.decode("utf8")
+    proc = run_django("--http-socket=127.0.0.1:0")
+    assert "WSGI app 0 (mountpoint='') ready in" in proc.communicate()[0].decode("utf8")
