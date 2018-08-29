@@ -45,7 +45,7 @@ def run_django(*args):
 
 
 def test_help():
-    assert "show this help" in run("--help").decode("utf8")
+    assert "show this help" in run("--help").decode("utf-8")
 
 
 def test_need_app():
@@ -53,10 +53,10 @@ def test_need_app():
         run("--need-app", "-s", "127.0.0.1:0")
         assert False
     except subprocess.CalledProcessError as e:
-        assert "no app loaded. GAME OVER" in e.output.decode("utf8")
+        assert "no app loaded. GAME OVER" in e.output.decode("utf-8")
 
 
 def test_django():
     """Start a Django HTTP server and then kill it"""
     proc = run_django("--http-socket=127.0.0.1:0")
-    assert "WSGI app 0 (mountpoint='') ready in" in proc.communicate()[0].decode("utf8")
+    assert "WSGI app 0 (mountpoint='') ready in" in proc.communicate()[0].decode("utf-8")
