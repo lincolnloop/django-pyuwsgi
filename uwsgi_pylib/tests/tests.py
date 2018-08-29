@@ -43,7 +43,6 @@ def run_django(*args):
     return proc
 
 
-
 def test_help():
     assert "show this help" in run("--help").decode("utf-8")
 
@@ -59,4 +58,6 @@ def test_need_app():
 def test_django():
     """Start a Django HTTP server and then kill it"""
     proc = run_django("--http-socket=127.0.0.1:0")
-    assert "WSGI app 0 (mountpoint='') ready in" in proc.communicate()[0].decode("utf-8")
+    assert "WSGI app 0 (mountpoint='') ready in" in proc.communicate()[0].decode(
+        "utf-8"
+    )
