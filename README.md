@@ -4,6 +4,8 @@ Run uWSGI as a Python module.
 
 ----
 
+[![build status](https://travis-ci.org/lincolnloop/uwsgi-pylib.svg?branch=master)](https://travis-ci.org/lincolnloop/uwsgi-pylib)
+
 ⚠️ This is experimental!
 
 ## Usage

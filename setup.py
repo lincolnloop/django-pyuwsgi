@@ -80,4 +80,10 @@ setup(
         "develop": UwsgiDevelopCommand,
         "bdist_wheel": bdist_wheel,
     },
+    extras_require={
+        "test": [
+            "pytest",
+            "Django"
+        ]
+    }
 )

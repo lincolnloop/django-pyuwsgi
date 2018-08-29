@@ -15,7 +15,7 @@ class Command(BaseCommand):
         # project.wsgi.application -> project.wsgi:application
         wsgi_module = ":".join(settings.WSGI_APPLICATION.rsplit(".", 1))
         default_args = ["--strict", "--need-app", "--module", wsgi_module]
-        if settings.STATIC_URL.startswith("/"):
+        if (settings.STATIC_URL or "").startswith("/"):
             default_args.extend(
                 [
                     "--static-map",
@@ -26,3 +26,6 @@ class Command(BaseCommand):
             )
         args = default_args + argv[2:]
         runner.run(*args)
+
+    def execute(self, *args, **options):
+        self.run_from_argv(["manage.py", "uwsgi"] + list(args))
