@@ -2,65 +2,68 @@ import os
 import subprocess
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import find_packages, setup, Distribution
 from setuptools.command.develop import develop
 from setuptools.command.install import install
+
+try:
+    from wheel.bdist_wheel import bdist_wheel
+
+    HAS_WHEEL = True
+except ImportError:
+    HAS_WHEEL = False
+
 
 from uwsgi_pylib import UWSGI_LIB, UWSGI_VERSION
 
 
 def install_uwsgi_as_lib():
-    if os.path.exists(UWSGI_LIB):
-        return
-    os.environ["UWSGI_AS_LIB"] = UWSGI_LIB
-    print("Building {}...".format(UWSGI_LIB))
-    subprocess.check_call(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "--no-cache-dir",
-            "--ignore-installed",
-            "uWSGI=={}".format(UWSGI_VERSION),
-        ]
-    )
+    if not os.path.exists(UWSGI_LIB):
+        subprocess.check_call(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--no-cache-dir",
+                "--ignore-installed",
+                "uWSGI=={}".format(UWSGI_VERSION),
+            ],
+            env={"UWSGI_AS_LIB": UWSGI_LIB},
+        )
 
 
-def build_uwsgi_lib(command_subclass):
-    orig_run = command_subclass.run
-
-    def install_uwsgi_and_run(self):
-        install_uwsgi_as_lib()
-        orig_run(self)
-
-    command_subclass.run = install_uwsgi_and_run
-    return command_subclass
-
-
-@build_uwsgi_lib
 class UwsgiDevelopCommand(develop):
-    pass
+    def run(self):
+        install_uwsgi_as_lib()
+        develop.run(self)
 
 
-@build_uwsgi_lib
 class UwsgiInstallCommand(install):
-    pass
+    def run(self):
+        install_uwsgi_as_lib()
+        install.run(self)
 
 
-try:
-    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+if HAS_WHEEL:
 
-    @build_uwsgi_lib
-    class bdist_wheel(_bdist_wheel):
-        def finalize_options(self):
-            _bdist_wheel.finalize_options(self)
-            # Flag wheels as platform dependent
-            self.root_is_pure = False
+    class UwsgiWheelCommand(bdist_wheel):
+        def run(self):
+            install_uwsgi_as_lib()
+            bdist_wheel.run(self)
 
 
-except ImportError:
-    bdist_wheel = None
+class UwsgiDistribution(Distribution):
+    is_pure = lambda s: False
+
+    def __init__(self, *attrs):
+        Distribution.__init__(self, *attrs)
+        self.cmdclass.update(
+            {"install": UwsgiInstallCommand, "develop": UwsgiDevelopCommand}
+        )
+        if HAS_WHEEL:
+            self.cmdclass["bdist_wheel"] = UwsgiWheelCommand
+
 
 README = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
@@ -75,15 +78,6 @@ setup(
     license="MIT",
     include_package_data=True,
     package_data={"uwsgi_pylib": [UWSGI_LIB]},
-    cmdclass={
-        "install": UwsgiInstallCommand,
-        "develop": UwsgiDevelopCommand,
-        "bdist_wheel": bdist_wheel,
-    },
-    extras_require={
-        "test": [
-            "pytest",
-            "Django"
-        ]
-    }
+    distclass=UwsgiDistribution,
+    extras_require={"test": ["pytest", "Django"]},
 )
