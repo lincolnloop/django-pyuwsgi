@@ -19,6 +19,8 @@ from uwsgi_pylib import UWSGI_LIB, UWSGI_VERSION
 
 def install_uwsgi_as_lib():
     if not os.path.exists(UWSGI_LIB):
+        env = os.environ.copy()
+        env.update({"UWSGI_AS_LIB": UWSGI_LIB})
         subprocess.check_call(
             [
                 sys.executable,
@@ -29,7 +31,7 @@ def install_uwsgi_as_lib():
                 "--ignore-installed",
                 "uWSGI=={}".format(UWSGI_VERSION),
             ],
-            env={"UWSGI_AS_LIB": UWSGI_LIB},
+            env=env,
         )
 
 
