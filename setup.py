@@ -8,17 +8,21 @@ from setuptools.command.install import install
 
 try:
     from wheel.bdist_wheel import bdist_wheel
-
-    HAS_WHEEL = True
 except ImportError:
-    HAS_WHEEL = False
-
+    bdist_wheel = None
 
 from uwsgi_pylib import UWSGI_LIB, UWSGI_VERSION
 
 
-def install_uwsgi_as_lib():
-    if not os.path.exists(UWSGI_LIB):
+class InstallUwsgiMixin:
+
+    def run(self):
+        if not os.path.exists(UWSGI_LIB):
+            self.install_uwsgi_as_lib()
+        super(InstallUwsgiMixin, self).run()
+
+    @classmethod
+    def install_uwsgi_as_lib(cls):
         subprocess.check_call(
             [
                 sys.executable,
@@ -33,24 +37,18 @@ def install_uwsgi_as_lib():
         )
 
 
-class UwsgiDevelopCommand(develop):
-    def run(self):
-        install_uwsgi_as_lib()
-        develop.run(self)
+class UwsgiDevelopCommand(InstallUwsgiMixin, develop):
+    pass
 
 
-class UwsgiInstallCommand(install):
-    def run(self):
-        install_uwsgi_as_lib()
-        install.run(self)
+class UwsgiInstallCommand(InstallUwsgiMixin, install):
+    pass
 
 
-if HAS_WHEEL:
+if bdist_wheel:
 
-    class UwsgiWheelCommand(bdist_wheel):
-        def run(self):
-            install_uwsgi_as_lib()
-            bdist_wheel.run(self)
+    class UwsgiWheelCommand(InstallUwsgiMixin, bdist_wheel):
+        pass
 
 
 class UwsgiDistribution(Distribution):
@@ -61,7 +59,7 @@ class UwsgiDistribution(Distribution):
         self.cmdclass.update(
             {"install": UwsgiInstallCommand, "develop": UwsgiDevelopCommand}
         )
-        if HAS_WHEEL:
+        if bdist_wheel:
             self.cmdclass["bdist_wheel"] = UwsgiWheelCommand
 
 
