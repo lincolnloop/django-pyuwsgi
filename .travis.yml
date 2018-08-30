@@ -1,3 +1,4 @@
+sudo: true
 language: python
 python:
   - "2.7"
@@ -12,9 +13,6 @@ matrix:
       sudo: true
 before_install:
   - pip install -U pip
-  - sudo apt-get update -q
-  # Workaround travis issue
-  - sudo apt-get install -y --reinstall build-essential
 install:
   - pip install .[test]
 script:
