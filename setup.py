@@ -23,6 +23,8 @@ class InstallUwsgiMixin:
 
     @classmethod
     def install_uwsgi_as_lib(cls):
+        env = os.environ.copy()
+        env.update({"UWSGI_AS_LIB": UWSGI_LIB})
         subprocess.check_call(
             [
                 sys.executable,
@@ -33,7 +35,7 @@ class InstallUwsgiMixin:
                 "--ignore-installed",
                 "uWSGI=={}".format(UWSGI_VERSION),
             ],
-            env={"UWSGI_AS_LIB": UWSGI_LIB},
+            env=env,
         )
 
 
