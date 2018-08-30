@@ -10,7 +10,11 @@ matrix:
     - python: 3.7
       dist: xenial
       sudo: true
-before_install: pip install -U pip
+before_install:
+  - pip install -U pip
+  - sudo apt-get update -q
+  # Workaround travis issue
+  - sudo apt-get install -y --reinstall build-essential
 install:
   - pip install .[test]
 script:
