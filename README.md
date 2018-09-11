@@ -1,6 +1,6 @@
 # django-pyuwsgi
 
-Run uWSGI as a Django management command.
+Run pyuwsgi (aka uWSGI) as a Django management command.
 
 ----
 
@@ -26,7 +26,7 @@ Run uWSGI as a Django management command.
 3. Run:
     
     ```
-    manage.py uwsgi --socket=:8000 ...
+    manage.py pyuwsgi --socket=:8000 ...
     ```
 
 Don't worry about setting the module you want to run or virtualenv/home, that will already be handled for you via the `WSGI_APPLICATION` setting and your current Python interpreter. If you've configured your static files to be served from a local URL, they'll be setup too.

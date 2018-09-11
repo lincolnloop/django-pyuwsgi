@@ -6,10 +6,10 @@ import pyuwsgi
 class Command(BaseCommand):
     """
     This bypasses any Django handling of the command and sends all arguments straight
-    to uWSGI.
+    to pyuwsgi.
     """
 
-    help = "Start uWSGI server"
+    help = "Start pyuwsgi server"
 
     def run_from_argv(self, argv):
         # project.wsgi.application -> project.wsgi:application

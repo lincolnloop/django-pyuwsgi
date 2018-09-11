@@ -2,8 +2,6 @@ import subprocess
 import sys
 import time
 
-import pytest
-
 
 def _args_to_str(args):
     """Turn a list of strings into a string that can be used as function args"""
@@ -16,7 +14,7 @@ def run_django(*args):
         [
             sys.executable,
             "-c",
-            "from django_pyuwsgi.management.commands.uwsgi import Command; "
+            "from django_pyuwsgi.management.commands.pyuwsgi import Command; "
             "Command().execute({})".format(_args_to_str(args)),
         ],
         stdout=subprocess.PIPE,
