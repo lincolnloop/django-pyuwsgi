@@ -18,4 +18,4 @@ install:
 script:
   # Ensure we are testing installed app, not local code
   - mkdir -p /tmp/sandbox && cd /tmp/sandbox
-  - pytest --pyargs uwsgi_pylib.tests.tests
+  - pytest --pyargs django_pyuwsgi.tests.tests

@@ -1,62 +1,36 @@
-# uWSGI-pylib
+# django-pyuwsgi
 
-Run uWSGI as a Python module.
+Run uWSGI as a Django management command.
 
 ----
 
-[![build status](https://travis-ci.org/lincolnloop/uwsgi-pylib.svg?branch=master)](https://travis-ci.org/lincolnloop/uwsgi-pylib)
-
-⚠️ This is experimental!
+[![build status](https://travis-ci.org/lincolnloop/django-pyuwsgi.svg?branch=master)](https://travis-ci.org/lincolnloop/django-pyuwsgi)
 
 ## Usage
 
-1. Install (this will take some time as uWSGI is compiled)
+1. Install:
 
     ```
-    pip install uWSGI-pylib
+    pip install django-pyuwsgi
     ```
 
-2. Import and run
+2. Add to `INSTALLED_APPS`:
 
     ```python
-    from uwsgi_pylib import runner
-    runner.run("--socket=:8000",
-               "--module=mywsgi:app")
- 
+    INSTALLED_APPS = [
+       # ...
+       "django_pyuwsgi",
+       # ...
+    ]
     ```
+3. Run:
     
-    Any uWSGI options will be accepted as arguments.
-    
-### Django Management Command
+    ```
+    manage.py uwsgi --socket=:8000 ...
+    ```
 
-For convenience, a Django management command wrapper is included. Simply add `uwsgi_pylib` to your `INSTALLED_APPS` and run:
-
-```
-manage.py uwsgi --socket=:8000 ...
-```
-
-This uses the `WSGI_APPLICATION` setting to determine what module to run and will also serve your static files if you have them set to be served from a local URL.
+Don't worry about setting the module you want to run or virtualenv/home, that will already be handled for you via the `WSGI_APPLICATION` setting and your current Python interpreter. If you've configured your static files to be served from a local URL, they'll be setup too.
 
 ## Motivation
 
-uWSGI isn't really a Python module. Running `pip install uWSGI` will build a binary you can run via `uwsgi`, but doesn't provide something you can run from within a Python module.
-
-In some scenarios, however, you want to run uWSGI as a Python module. For example, if you are trying to distribute an application with a single entrypoint for command-line interaction. This may be helpful when building Docker containers or building self-contained Python apps with something like [shiv](https://github.com/linkedin/shiv).
-
-
-## How it Works
-
-
-This takes advantage of some undocumented parts of uWSGI to build and run it as a ctypes compatible shared library instead of the normal executable. This process is described by the developer in [unbit/uwsgi#564](https://github.com/unbit/uwsgi/issues/564#issuecomment-37719925).
-
-### Creating the Shared Library
-
-By setting the environment variable `UWSGI_AS_LIB`, we can force `pip install uwsgi` to output a shared library. In `setup.py` we override the install commands to build the library for your architecture and include it in the package.
-
-### Running the Shared Library as a Python Module
-
-The shared library is loaded via the `ctypes` library and executed using an exported function `uwsgi_init`.
-
-## Known Issues
-
-* Randomly crashes on MacOS. See [unbit/uwsgi#1796](https://github.com/unbit/uwsgi/issues/1796)
+In some scenarios, it is beneficial to distribute a Django project with a single entrypoint for command-line interaction. This can come in handy when building Docker containers or self-contained Python apps with something like [shiv](https://github.com/linkedin/shiv).

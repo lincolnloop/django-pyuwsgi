@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.management import BaseCommand
-from uwsgi_pylib import runner
+import pyuwsgi
 
 
 class Command(BaseCommand):
@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 ]
             )
         args = default_args + argv[2:]
-        runner.run(*args)
+        pyuwsgi.run(*args)
 
     def execute(self, *args, **options):
-        self.run_from_argv(["manage.py", "uwsgi"] + list(args))
+        self.run_from_argv(["manage.py", "pyuwsgi"] + list(args))
