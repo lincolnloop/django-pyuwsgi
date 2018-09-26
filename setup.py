@@ -7,7 +7,7 @@ README = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
 setup(
     name="django-pyuwsgi",
-    version="1.1.0",
+    version="1.1.1",
     description="uWSGI as a Django management command",
     author="Peter Baumgartner",
     author_email="pete@lincolnloop.com",
@@ -24,6 +24,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
