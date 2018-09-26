@@ -1,10 +1,10 @@
 # django-pyuwsgi
 
-Run pyuwsgi (aka uWSGI) as a Django management command.
+Run [pyuwsgi](https://pypi.org/project/pyuwsgi/) (aka uWSGI) as a Django management command.
 
 ----
 
-[![build status](https://travis-ci.org/lincolnloop/django-pyuwsgi.svg?branch=master)](https://travis-ci.org/lincolnloop/django-pyuwsgi)
+[![build status](https://travis-ci.org/lincolnloop/django-pyuwsgi.svg?branch=master)](https://travis-ci.org/lincolnloop/django-pyuwsgi) [![pypi](https://img.shields.io/pypi/v/django-pyuwsgi.svg)](https://pypi.org/pypi/django-pyuwsgi) [![pyversions](https://img.shields.io/pypi/pyversions/django-pyuwsgi.svg)](https://pypi.org/pypi/django-pyuwsgi)
 
 ## Usage
 
@@ -29,7 +29,41 @@ Run pyuwsgi (aka uWSGI) as a Django management command.
     manage.py pyuwsgi --socket=:8000 ...
     ```
 
-Don't worry about setting the module you want to run or virtualenv/home, that will already be handled for you via the `WSGI_APPLICATION` setting and your current Python interpreter. If you've configured your static files to be served from a local URL, they'll be setup too.
+## Configuration
+
+Pyuwsgi already knows the Python interpreter and virtualenv (if applicable) to use from the Django management command environment. By default, it will run with the following flags (using `settings.WSGI_APPLICATION` to determine the module):
+
+```
+--strict --need-app --module={derived}
+```
+
+If you have `STATIC_URL` defined with a local URL, it will also add `--static-map`, derived from `STATIC_URL` and `STATIC_ROOT`.
+
+You can pass any additional arguments uWSGI accepts in from the command line.
+
+But uWSGI has a lot of flags, and many of them, you want every time you run the project. For that scenario, you can configure your own defaults using the optional setting, `PYUWSGI_ARGS`. Here's an example you might find helpful:
+
+```python
+PYUWSGI_ARGS = [
+    "--master",
+    "--strict",
+    "--need-app",
+    "--module".
+    ":".join(WSGI_APPLICATION.rsplit(".", 1)),
+    "--no-orphans",
+    "--vacuum",
+    "--auto-procname",
+    "--enable-threads",
+    "--offload-threads=4",
+    "--thunder-lock",
+    "--static-map",
+    "=".join([STATIC_URL.rstrip("/"), STATIC_ROOT]),
+    "--static-expires",
+    "/* 7776000",
+]
+```
+
+Don't forget to also set something like `--socket=:8000` or `--http=:8000` so your app listens on a port. Depending on your setup, it may make more sense to pass this in via the command line than hard-coding it in your settings. 
 
 ## Motivation
 

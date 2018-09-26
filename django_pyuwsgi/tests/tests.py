@@ -1,6 +1,13 @@
+import os
 import subprocess
 import sys
 import time
+
+from django.test import override_settings
+
+from django_pyuwsgi.management.commands.pyuwsgi import get_default_args
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_pyuwsgi.tests.django_settings")
 
 
 def _args_to_str(args):
@@ -19,7 +26,6 @@ def run_django(*args):
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        env={"DJANGO_SETTINGS_MODULE": "django_pyuwsgi.tests.django_settings"},
     )
     time.sleep(1)
     proc.kill()
@@ -32,3 +38,18 @@ def test_django():
     assert "WSGI app 0 (mountpoint='') ready in" in proc.communicate()[0].decode(
         "utf-8"
     )
+
+
+def test_default_args():
+    assert get_default_args() == [
+        "--strict",
+        "--need-app",
+        "--module=django_pyuwsgi.tests.django_settings:application",
+        "--static-map",
+        "/static=/tmp/static",
+    ]
+
+
+@override_settings(PYUWSGI_ARGS=["--master", "--thunder-lock"])
+def test_settings_args():
+    assert get_default_args() == ["--master", "--thunder-lock"]
